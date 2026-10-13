@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "updated": "2026-10-13",
+  "note": "远程站点配置。urlTemplate 支持 {q}/{query}/{page} 占位符；选择器全用 CSS。站点改版时只改这个文件即可，App 不用重新发版。",
+  "disabled": [],
+  "sites": [
+    {
+      "id": "tkty_net",
+      "name": "TorrentKitty 镜像",
+      "group": "综合",
+      "siteUrl": "https://www.torrentkitty.net",
+      "urlTemplate": "https://www.torrentkitty.net/search/{q}/{page}/",
+      "itemSelector": "table#archiveResult tr",
+      "titleSelector": "td.name",
+      "titleAttr": "text",
+      "magnetSelector": "a[href^=magnet:]",
+      "magnetAttr": "href",
+      "sizeSelector": "td.size",
+      "sizeAttr": "text",
+      "detailSelector": "a[rel=information]",
+      "detailAttr": "href",
+      "note": "主站不可用时的回退镜像",
+      "defaultOn": true
+    }
+  ]
+}
