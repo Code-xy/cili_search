@@ -10,7 +10,7 @@ import org.jsoup.Jsoup
 
 /**
  * 動漫花園原站，HTML 表格。
- * 列序：完成时间 | 分類 | 標題 | 磁力 | 大小 | 下載數(btl) | 種子數(bts) | 完成數 | 發布者
+ * 列序（已按实测表头校对）：張貼日期 | 分類 | 標題 | 磁鏈 | 大小 | 種子 | 下載 | 完成 | 發佈人
  */
 object DmhySource : MagnetSource {
     override val id = "dmhy"
@@ -30,9 +30,10 @@ object DmhySource : MagnetSource {
             val magnet = tr.selectFirst("a.arrow-magnet")?.attr("href")?.trim()
                 ?.takeIf { it.startsWith("magnet") }
             val tds = tr.select("td")
+            // 列序（实测表头）：張貼日期|分類|標題|磁鏈|大小|種子|下載|完成|發佈人
             val size = tds.getOrNull(4)?.text()?.trim().orEmpty()
-            val leechers = tds.getOrNull(5)?.text()?.trim()?.toIntOrNull() ?: -1
-            val seeders = tds.getOrNull(6)?.text()?.trim()?.toIntOrNull() ?: -1
+            val seeders = tds.getOrNull(5)?.text()?.trim()?.toIntOrNull() ?: -1
+            val leechers = tds.getOrNull(6)?.text()?.trim()?.toIntOrNull() ?: -1
             out.add(
                 MagnetItem(
                     title = title,

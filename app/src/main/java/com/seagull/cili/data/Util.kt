@@ -21,14 +21,14 @@ object Util {
         "udp://tracker.tiny-vps.com:6969/announce"
     )
 
-    private val SIZE_RE = Regex("([0-9.]+)[ ]*([KMGT]?B)", RegexOption.IGNORE_CASE)
+    private val SIZE_RE = Regex("([0-9.]+)[ ]*([KMGT]?i?B)", RegexOption.IGNORE_CASE)
     private val HASH_RE = Regex("btih:([0-9a-zA-Z]{32,40})")
 
     fun sizeToBytes(text: String?): Long {
         if (text.isNullOrBlank()) return 0L
         val m = SIZE_RE.find(text) ?: return 0L
         val v = m.groupValues[1].toDoubleOrNull() ?: return 0L
-        val unit = m.groupValues[2].uppercase(Locale.US)
+        val unit = m.groupValues[2].uppercase(Locale.US).replace("I", "")
         val mul = when (unit) {
             "TB" -> 1024L * 1024 * 1024 * 1024
             "GB" -> 1024L * 1024 * 1024

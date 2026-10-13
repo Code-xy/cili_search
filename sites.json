@@ -13,7 +13,7 @@
       "itemSelector": "table#archiveResult tr",
       "titleSelector": "td.name",
       "titleAttr": "text",
-      "magnetSelector": "a[href^=magnet:]",
+      "magnetSelector": "a[href^='magnet:']",
       "magnetAttr": "href",
       "sizeSelector": "td.size",
       "sizeAttr": "text",

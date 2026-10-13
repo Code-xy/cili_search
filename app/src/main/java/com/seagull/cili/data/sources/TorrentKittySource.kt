@@ -39,7 +39,7 @@ object TorrentKittySource : MagnetSource {
             val nameCell = tr.selectFirst("td.name") ?: continue
             val title = nameCell.text().trim()
             if (title.isEmpty()) continue
-            val magnet = tr.selectFirst("a[href^=magnet:]")?.attr("href")?.trim()
+            val magnet = tr.selectFirst("a[href^='magnet:']")?.attr("href")?.trim()
             val rel = tr.selectFirst("a[rel=information]")?.attr("href")?.trim().orEmpty()
             out.add(
                 MagnetItem(

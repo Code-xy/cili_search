@@ -39,7 +39,7 @@
       "itemSelector": "div.result-item",
       "titleSelector": "a.title",
       "titleAttr": "text",
-      "magnetSelector": "a[href^=magnet:]",
+      "magnetSelector": "a[href^='magnet:']",
       "magnetAttr": "href",
       "sizeSelector": "span.size",
       "seedersSelector": "span.seed",
