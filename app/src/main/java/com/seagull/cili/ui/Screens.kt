@@ -57,7 +57,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import android.content.Context
+import android.content.Intent
 import com.seagull.cili.data.MagnetItem
+import com.seagull.cili.data.PreviewSite
+import com.seagull.cili.data.TitleClean
 import com.seagull.cili.data.Util
 
 @Composable
@@ -121,6 +125,7 @@ private fun SearchScreen(vm: SearchViewModel) {
     val history by vm.history.collectAsStateWithLifecycle()
     val favs by vm.favs.collectAsStateWithLifecycle()
     val tip by vm.tip.collectAsStateWithLifecycle()
+    val previewSite by vm.previewSite.collectAsStateWithLifecycle()
     var detail by remember { mutableStateOf<MagnetItem?>(null) }
 
     Column(Modifier.fillMaxSize().padding(horizontal = 14.dp)) {
@@ -172,6 +177,7 @@ private fun SearchScreen(vm: SearchViewModel) {
                             val target = item.magnet ?: item.torrentUrl ?: item.detailUrl
                             if (target != null) Actions.open(ctx, target)
                         },
+                        onPreview = { openPreview(ctx, previewSite, item.title) },
                         onDetail = { detail = item }
                     )
                 }
@@ -195,7 +201,11 @@ private fun SearchScreen(vm: SearchViewModel) {
         DetailSheet(
             item = d,
             onDismiss = { detail = null },
-            onCopy = { d.magnet?.let { Actions.copy(ctx, it, "磁力链接已复制") } },
+            onCopy = {
+                val link = d.magnet ?: d.torrentUrl
+                if (link != null) Actions.copy(ctx, link, if (d.magnet != null) "磁力链接已复制" else "种子链接已复制")
+            },
+            onPreview = { openPreview(ctx, previewSite, d.title) },
             onShare = { Actions.share(ctx, d.magnet ?: d.torrentUrl ?: d.detailUrl ?: d.title) },
             onOpen = {
                 val t = d.magnet ?: d.torrentUrl ?: d.detailUrl
@@ -260,6 +270,7 @@ private fun EmptyZone(
 private fun FavScreen(vm: SearchViewModel) {
     val ctx = LocalContext.current
     val favs by vm.favs.collectAsStateWithLifecycle()
+    val previewSite by vm.previewSite.collectAsStateWithLifecycle()
     var detail by remember { mutableStateOf<MagnetItem?>(null) }
 
     if (favs.isEmpty()) {
@@ -288,6 +299,7 @@ private fun FavScreen(vm: SearchViewModel) {
                     val t = item.magnet ?: item.torrentUrl ?: item.detailUrl
                     if (t != null) Actions.open(ctx, t)
                 },
+                onPreview = { openPreview(ctx, previewSite, item.title) },
                 onDetail = { detail = item }
             )
         }
@@ -297,7 +309,11 @@ private fun FavScreen(vm: SearchViewModel) {
         DetailSheet(
             item = d,
             onDismiss = { detail = null },
-            onCopy = { d.magnet?.let { Actions.copy(ctx, it, "磁力链接已复制") } },
+            onCopy = {
+                val link = d.magnet ?: d.torrentUrl
+                if (link != null) Actions.copy(ctx, link, if (d.magnet != null) "磁力链接已复制" else "种子链接已复制")
+            },
+            onPreview = { openPreview(ctx, previewSite, d.title) },
             onShare = { Actions.share(ctx, d.magnet ?: d.torrentUrl ?: d.detailUrl ?: d.title) },
             onOpen = {
                 val t = d.magnet ?: d.torrentUrl ?: d.detailUrl
@@ -407,7 +423,8 @@ private fun DetailSheet(
     onDismiss: () -> Unit,
     onCopy: () -> Unit,
     onShare: () -> Unit,
-    onOpen: () -> Unit
+    onOpen: () -> Unit,
+    onPreview: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
@@ -436,12 +453,37 @@ private fun DetailSheet(
                 LabeledText("详情页", item.detailUrl)
             }
             Spacer(Modifier.height(16.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilledTonalButton(onClick = onCopy) { Text("复制磁力") }
-                OutlinedButton(onClick = onOpen) { Text("打开") }
-                OutlinedButton(onClick = onShare) { Text("分享") }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                FilledTonalButton(onClick = onPreview, shape = RoundedCornerShape(12.dp)) {
+                    Text("预览", fontSize = 13.sp)
+                }
+                TextButton(onClick = onCopy) { Text("复制链接", fontSize = 13.sp) }
+                TextButton(onClick = onOpen) { Text("打开", fontSize = 13.sp) }
+                TextButton(onClick = onShare) { Text("分享", fontSize = 13.sp) }
             }
         }
+    }
+}
+
+private fun openPreview(ctx: Context, site: PreviewSite, title: String) {
+    val q = TitleClean.clean(title)
+    if (q.isEmpty()) {
+        Actions.toast(ctx, "标题洗不出关键词，换个条目试试")
+        return
+    }
+    val url = site.searchUrlTemplate.replace("{q}", Util.enc(q))
+    try {
+        ctx.startActivity(
+            Intent(ctx, PreviewActivity::class.java)
+                .putExtra(PreviewActivity.EXTRA_URL, url)
+                .putExtra(PreviewActivity.EXTRA_KEYWORD, q)
+                .putExtra(PreviewActivity.EXTRA_SITE, site.name)
+        )
+    } catch (e: Exception) {
+        Actions.open(ctx, url)
     }
 }
 

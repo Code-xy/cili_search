@@ -154,6 +154,7 @@ fun ResultCard(
     onCopy: () -> Unit,
     onShare: () -> Unit,
     onOpen: () -> Unit,
+    onPreview: () -> Unit,
     onDetail: () -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
@@ -213,11 +214,13 @@ fun ResultCard(
                     FilledTonalButton(onClick = onCopy, shape = RoundedCornerShape(12.dp)) {
                         Text("复制磁力", fontSize = 12.5.sp)
                     }
-                    TextButton(onClick = onOpen) { Text("打开", fontSize = 12.5.sp) }
                 } else {
                     FilledTonalButton(onClick = onOpen, shape = RoundedCornerShape(12.dp)) {
                         Text("打开种子", fontSize = 12.5.sp)
                     }
+                }
+                FilledTonalButton(onClick = onPreview, shape = RoundedCornerShape(12.dp)) {
+                    Text("预览", fontSize = 12.5.sp)
                 }
                 TextButton(onClick = onShare) { Text("分享", fontSize = 12.5.sp) }
                 Box(Modifier.weight(1f))

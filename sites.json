@@ -2,6 +2,11 @@
   "version": 1,
   "updated": "2026-10-13",
   "note": "远程站点配置。urlTemplate 支持 {q}/{query}/{page} 占位符；选择器全用 CSS。站点改版时只改这个文件即可，App 不用重新发版。",
+  "preview": {
+    "name": "爱壹帆",
+    "searchUrlTemplate": "https://m.iyf.tv/search?keyword={q}",
+    "_comment": "点「预览」用它搜片名直接看。整条可换成任意站点，改这里就行。"
+  },
   "disabled": [],
   "sites": [
     {

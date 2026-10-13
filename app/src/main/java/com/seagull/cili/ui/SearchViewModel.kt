@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.seagull.cili.Net
 import com.seagull.cili.data.MagnetItem
 import com.seagull.cili.data.MagnetSource
+import com.seagull.cili.data.PreviewSite
 import com.seagull.cili.data.RemoteConfig
 import com.seagull.cili.data.SearchEngine
 import com.seagull.cili.data.SourceEvent
@@ -43,6 +44,8 @@ class SearchViewModel(app: Application) : AndroidViewModel(app) {
     private val _disabled = MutableStateFlow<Set<String>>(emptySet())
     val disabled = _disabled.asStateFlow()
 
+    val previewSite = MutableStateFlow(PreviewSite())
+
     val history = MutableStateFlow<List<String>>(emptyList())
     val favs = MutableStateFlow<List<MagnetItem>>(emptyList())
 
@@ -67,7 +70,9 @@ class SearchViewModel(app: Application) : AndroidViewModel(app) {
         val list = ArrayList<MagnetSource>(SourceRegistry.builtIn)
         if (configJson != null) {
             try {
-                RemoteConfig.parse(configJson).sites.forEach { list.add(SelectorSource(it)) }
+                val cfg = RemoteConfig.parse(configJson)
+                cfg.sites.forEach { list.add(SelectorSource(it)) }
+                previewSite.value = cfg.preview
             } catch (e: Exception) {
                 // 配置坏了就用内置的
             }

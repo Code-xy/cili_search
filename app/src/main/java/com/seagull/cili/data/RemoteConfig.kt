@@ -5,6 +5,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
+/** 在线预览站点：拿洗好的片名跳过去直接看，模板里 {q} 是关键词。 */
+data class PreviewSite(
+    val name: String = "爱壹帆",
+    val searchUrlTemplate: String = "https://m.iyf.tv/search?keyword={q}"
+)
+
 /** 远程站点定义：站点改版/换域名时改仓库里的 sites.json 就行，不用重新发版。 */
 data class SiteSpec(
     val id: String,
@@ -34,13 +40,21 @@ object RemoteConfig {
 
     const val CONFIG_URL = "https://raw.githubusercontent.com/Code-xy/cili_search/main/sites.json"
 
-    data class Config(val disabled: List<String>, val sites: List<SiteSpec>)
+    data class Config(val disabled: List<String>, val sites: List<SiteSpec>, val preview: PreviewSite)
 
     fun parse(json: String): Config {
         val o = JSONObject(json)
         val disabled = ArrayList<String>()
         o.optJSONArray("disabled")?.let { a ->
             for (i in 0 until a.length()) disabled.add(a.optString(i))
+        }
+            var preview = PreviewSite()
+        o.optJSONObject("preview")?.let { p ->
+            preview = PreviewSite(
+                name = p.optString("name").trim().ifEmpty { "爱壹帆" },
+                searchUrlTemplate = p.optString("searchUrlTemplate").trim()
+                    .ifEmpty { PreviewSite().searchUrlTemplate }
+            )
         }
         val sites = ArrayList<SiteSpec>()
         o.optJSONArray("sites")?.let { arr ->
@@ -77,7 +91,7 @@ object RemoteConfig {
                 )
             }
         }
-        return Config(disabled, sites)
+        return Config(disabled, sites, preview)
     }
 
     suspend fun fetch(url: String = CONFIG_URL): Config = withContext(Dispatchers.IO) {

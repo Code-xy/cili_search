@@ -10,6 +10,8 @@
 - **磁力去重 + 排序**：按 infohash 去重，按做种数降序排列
 - **收藏 / 历史**：本地存储，无需账号
 - **远程站点配置**：站点改版或换域名时，改仓库根目录的 `sites.json` 即可，无需重新发版
+- **在线预览**：点结果卡「预览」，自动把种子标题洗成片名（`[字幕组][名侦探柯南][第1216集][WEBRIP][1080P]` → `名侦探柯南`），
+  跳 iyf.tv 站内搜索直接看，不用先下载。预览站点在 `sites.json` 的 `preview` 字段里可换
 
 ## 内置站点（全部实测可用）
 
@@ -28,6 +30,7 @@
 
 ```json
 {
+  "preview": { "name": "爱壹帆", "searchUrlTemplate": "https://m.iyf.tv/search?keyword={q}" },
   "disabled": ["apibay"],
   "sites": [
     {
